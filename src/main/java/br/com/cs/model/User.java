@@ -43,9 +43,7 @@ public class User {
 	
 	private String token;
 	
-	@OneToMany(cascade=CascadeType.PERSIST)
-//	@JoinColumn(columnDefinition="id")
-	
+	@OneToMany(cascade=CascadeType.ALL)
 	private List<Phone> phones;
 	
 	public List<Phone> getPhones() {

@@ -3,17 +3,17 @@ package br.com.cs.dao;
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
-import javax.transaction.Transactional;
+import javax.persistence.PersistenceContextType;
+import javax.persistence.PersistenceProperty;
 
 import org.springframework.stereotype.Repository;
 
 import br.com.cs.model.User;
 
 @Repository
-@Transactional
 public class UserDao {
 
-	@PersistenceContext
+	@PersistenceContext(type = PersistenceContextType.TRANSACTION, properties = @PersistenceProperty(name="org.hibernate.flushMode", value="COMMIT"))
 	private EntityManager manager;
 	
 	public void save(User user) throws Exception {
@@ -23,8 +23,8 @@ public class UserDao {
 	public User findByEmail(String email) {
 		try { 
 			User user = (User) manager.createNamedQuery(User.FIND_BY_EMAIL)
-					.setParameter("email", email)
-							.getSingleResult();
+									  .setParameter("email", email)
+									  .getSingleResult();
 			
 			return user;
 		} catch (NoResultException e) {

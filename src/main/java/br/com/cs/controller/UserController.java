@@ -8,17 +8,20 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.DigestUtils;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import br.com.cs.dao.UserDao;
+import br.com.cs.model.Login;
 import br.com.cs.model.User;
 import br.com.cs.wrapper.ResponseWrapper;
 import br.com.cs.wrapper.UserWrapper;
 
 @Controller
+@Transactional
 public class UserController {
 	
 	@Autowired
@@ -57,6 +60,44 @@ public class UserController {
 			
 			return new ResponseEntity(responseWrapper, HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
+	}
+	
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@RequestMapping(value = "/user/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST )
+	public ResponseEntity login(@RequestBody Login login) {
+		
+		try {
+			User user = userDao.findByEmail(login.getEmail());
+			
+			if(user != null) {
+				String loginEncryptedPassword = encryptPassword(login.getPassword());
+				
+				if(loginEncryptedPassword.equals(user.getPassword())) {
+					user.setLastLogin(new Date());
+					
+					userDao.save(user);
+					
+					UserWrapper userWrapper = new UserWrapper(user); 
+					
+					return new ResponseEntity(userWrapper, HttpStatus.OK);
+				} else {
+					String errorMessage = "Usuário e/ou senha inválidos";
+					ResponseWrapper responseWrapper = new ResponseWrapper(errorMessage);
+					
+					return new ResponseEntity(responseWrapper, HttpStatus.UNAUTHORIZED);
+				}
+			} else {
+				String errorMessage = "Usuário e/ou senha inválidos";
+				ResponseWrapper responseWrapper = new ResponseWrapper(errorMessage);
+				
+				return new ResponseEntity(responseWrapper, HttpStatus.FORBIDDEN);
+			}
+		} catch (Exception e) {
+			String errorMessage = e.getMessage();
+			ResponseWrapper responseWrapper = new ResponseWrapper(errorMessage);
+			
+			return new ResponseEntity(responseWrapper, HttpStatus.INTERNAL_SERVER_ERROR);
+		}
 	}
 	
 	private String encryptPassword(String password) {
