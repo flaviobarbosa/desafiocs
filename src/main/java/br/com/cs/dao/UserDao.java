@@ -31,4 +31,14 @@ public class UserDao {
 			return null;
 		}
 	}
+	
+	public User findById(Integer id) {
+		try {
+			User user = (User) manager.find(User.class, id);
+			
+			return user;
+		} catch (NoResultException e) {
+			return null;
+		}
+	}
 }

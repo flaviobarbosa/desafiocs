@@ -1,13 +1,17 @@
 package br.com.cs.wrapper;
 
-import java.util.Date;
+import java.util.List;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import br.com.cs.model.Phone;
 import br.com.cs.model.User;
 
-@JsonInclude(content=Include.NON_EMPTY)
+@JsonInclude(content=Include.NON_NULL)
 public class UserWrapper {
 
 	private Integer id;
@@ -16,22 +20,31 @@ public class UserWrapper {
 	
 	private String email;
 	
-	private Date created;
+	private String created;
 	
-	private Date modified;
+	private String modified;
 	
-	private Date last_login;
+	private String last_login;
 	
 	private String token;
+	
+	private List<Phone> phones;
 
 	public UserWrapper(User user) {
 		this.id = user.getId();
 		this.name = user.getName();
 		this.email = user.getEmail();
-		this.created = user.getCreated();
-		this.modified = user.getModified();
-		this.last_login = user.getLastLogin();
 		this.token = user.getToken();
+		this.phones = user.getPhones();
+		
+		DateTime lastLogin = new DateTime(user.getLastLogin());
+		this.last_login = lastLogin.toString(DateTimeFormat.mediumDateTime());
+		
+		DateTime created = new DateTime(user.getCreated());
+		this.created = created.toString(DateTimeFormat.mediumDateTime());
+		
+		DateTime modified = new DateTime(user.getModified());
+		this.modified = modified.toString(DateTimeFormat.mediumDateTime());
 	}
 
 	public Integer getId() {
@@ -58,27 +71,27 @@ public class UserWrapper {
 		this.email = email;
 	}
 
-	public Date getCreated() {
+	public String getCreated() {
 		return created;
 	}
 
-	public void setCreated(Date created) {
+	public void setCreated(String created) {
 		this.created = created;
 	}
 
-	public Date getModified() {
+	public String getModified() {
 		return modified;
 	}
 
-	public void setModified(Date modified) {
+	public void setModified(String modified) {
 		this.modified = modified;
 	}
 
-	public Date getLast_login() {
+	public String getLast_login() {
 		return last_login;
 	}
 
-	public void setLast_login(Date last_login) {
+	public void setLast_login(String last_login) {
 		this.last_login = last_login;
 	}
 
@@ -88,6 +101,14 @@ public class UserWrapper {
 
 	public void setToken(String token) {
 		this.token = token;
+	}
+	
+	public List<Phone> getPhones() {
+		return phones;
+	}
+
+	public void setPhones(List<Phone> phones) {
+		this.phones = phones;
 	}
 }
 
