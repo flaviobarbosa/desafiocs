@@ -39,6 +39,10 @@ public class Phone {
 	public void setNumber(String number) {
 		this.number = number;
 	}
-	
+
+	@Override
+	public String toString() {
+		return "Phone [id=" + id + ", ddd=" + ddd + ", number=" + number + "]";
+	}
 	
 }

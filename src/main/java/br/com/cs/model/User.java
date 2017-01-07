@@ -3,20 +3,34 @@ package br.com.cs.model;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
+@NamedQueries({
+	@NamedQuery(name=User.FIND_BY_EMAIL, query="Select u FROM User u where u.email = :email")
+})
 public class User {
 
+	public static final String FIND_BY_EMAIL = "br.com.cs.model.User#findByEmail";
+	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer id;
 	
 	private String name;
 	
+	@Column( nullable = false, unique = true )
 	private String email;
 	
 	private String password;
@@ -27,7 +41,20 @@ public class User {
 	
 	private Date lastLogin;
 	
-//	private List<Phone> phones;
+	private String token;
+	
+	@OneToMany(cascade=CascadeType.PERSIST)
+//	@JoinColumn(columnDefinition="id")
+	
+	private List<Phone> phones;
+	
+	public List<Phone> getPhones() {
+		return phones;
+	}
+
+	public void setPhones(List<Phone> phones) {
+		this.phones = phones;
+	}
 
 	public Integer getId() {
 		return id;
@@ -84,6 +111,19 @@ public class User {
 	public void setLastLogin(Date lastLogin) {
 		this.lastLogin = lastLogin;
 	}
-	
-	
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	@Override
+	public String toString() {
+		return "User [id=" + id + ", name=" + name + ", email=" + email + ", password=" + password + ", created="
+				+ created + ", modified=" + modified + ", lastLogin=" + lastLogin + ", token=" + token + "]";
+	}
+
 }
