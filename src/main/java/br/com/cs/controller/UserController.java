@@ -123,7 +123,7 @@ public class UserController {
 					DateTime now = new DateTime();
 					DateTime lastLogin = new DateTime(user.getLastLogin());
 					
-					int minutesPassedSinceLastLogin = Minutes.minutesBetween(now, lastLogin).getMinutes();
+					int minutesPassedSinceLastLogin = Minutes.minutesBetween(lastLogin, now).getMinutes();
 					
 					if(minutesPassedSinceLastLogin <= 30) {
 						UserWrapper response = new UserWrapper(user);
