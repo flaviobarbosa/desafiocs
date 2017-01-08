@@ -11,7 +11,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import br.com.cs.model.Phone;
 import br.com.cs.model.User;
 
-@JsonInclude(content=Include.NON_NULL)
+@JsonInclude(content=Include.NON_EMPTY)
 public class UserWrapper {
 
 	private Integer id;
@@ -30,11 +30,11 @@ public class UserWrapper {
 	
 	private List<Phone> phones;
 
-	public UserWrapper(User user) {
+	public UserWrapper(User user, String token) {
 		this.id = user.getId();
 		this.name = user.getName();
 		this.email = user.getEmail();
-		this.token = user.getToken();
+		this.token = token;
 		this.phones = user.getPhones();
 		
 		DateTime lastLogin = new DateTime(user.getLastLogin());

@@ -41,14 +41,17 @@ public class UserController {
 				user.setCreated(date);
 				user.setModified(date);
 				user.setLastLogin(date);
-				user.setToken(UUID.randomUUID().toString());
 				
-				String encryptedPassword = encryptPassword(user.getPassword());
+				String token = UUID.randomUUID().toString();
+				String encryptedToken = encrypt(token) ;
+				user.setToken(encryptedToken);
+				
+				String encryptedPassword = encrypt(user.getPassword());
 				user.setPassword(encryptedPassword);
 				
 				userDao.save(user);
 
-				UserWrapper userWrapper = new UserWrapper(user); 
+				UserWrapper userWrapper = new UserWrapper(user, token); 
 				
 				return new ResponseEntity(userWrapper, HttpStatus.OK);
 				
@@ -74,14 +77,14 @@ public class UserController {
 			User user = userDao.findByEmail(login.getEmail());
 			
 			if(user != null) {
-				String loginEncryptedPassword = encryptPassword(login.getPassword());
+				String loginEncryptedPassword = encrypt(login.getPassword());
 				
 				if(loginEncryptedPassword.equals(user.getPassword())) {
 					user.setLastLogin(new Date());
 					
 					userDao.save(user);
 					
-					UserWrapper userWrapper = new UserWrapper(user); 
+					UserWrapper userWrapper = new UserWrapper(user, null); 
 					
 					return new ResponseEntity(userWrapper, HttpStatus.OK);
 				} else {
@@ -118,7 +121,9 @@ public class UserController {
 			User user = userDao.findById(id);
 			
 			if(user != null) {
-				if(token.equals(user.getToken())) {
+				String encryptedToken = encrypt(token);
+				
+				if(encryptedToken.equals(user.getToken())) {
 					
 					DateTime now = new DateTime();
 					DateTime lastLogin = new DateTime(user.getLastLogin());
@@ -126,7 +131,7 @@ public class UserController {
 					int minutesPassedSinceLastLogin = Minutes.minutesBetween(lastLogin, now).getMinutes();
 					
 					if(minutesPassedSinceLastLogin <= 30) {
-						UserWrapper response = new UserWrapper(user);
+						UserWrapper response = new UserWrapper(user, token);
 						
 						return new ResponseEntity(response, HttpStatus.OK);
 					} else {
@@ -155,7 +160,7 @@ public class UserController {
 		}
 	}
 	
-	private String encryptPassword(String password) {
+	private String encrypt(String password) {
 		return DigestUtils.md5DigestAsHex(password.getBytes());
 	}
 }
